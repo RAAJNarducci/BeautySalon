@@ -1,0 +1,48 @@
+<div class="d-flex justify-content-center">
+  <div class="col-md-6">
+    <div class="card">
+        <div class="card-header">
+          <h4>
+            Bem vindo !
+          </h4>
+        </div>
+        <div class="card-body">
+          <hr class="colorgraph">
+          <br>
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+              <div class="form-group">
+                  <input 
+                  type="email" 
+                  formControlName="username" 
+                  class="form-control"
+                  [ngClass]="{ 'is-invalid': submitted && f.username.errors }" 
+                  id="_inputEmail" 
+                  placeholder="Email">
+
+                  <div *ngIf="submitted && f.username.errors" class="invalid-feedback">
+                      <div *ngIf="f.username.errors.required">Username is required</div>
+                  </div>
+              </div>
+              <div class="form-group">
+                  <input 
+                  type="password"
+                  formControlName="password" 
+                  class="form-control"
+                  [ngClass]="{ 'is-invalid': submitted && f.password.errors }"
+                  id="_inputPassword" 
+                  placeholder="Senha">
+                  
+                  <div *ngIf="submitted && f.password.errors" class="invalid-feedback">
+                      <div *ngIf="f.password.errors.required">Password is required</div>
+                  </div>
+              </div>
+                <hr>
+                <button type="submit" class="btn btn-outline-primary btn-lg btn-block">Entrar</button>
+            </form>
+        </div>
+        <div class="card-footer text-right">
+            <button class="btn btn-outline-secondary btn-lg btn-block" [routerLink]="['/register']">Registrar</button>
+        </div>
+    </div>
+  </div>
+</div>

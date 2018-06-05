@@ -1,0 +1,44 @@
+<app-calendar-header
+  [locale]="'pt-PT'"
+  [(view)]="view"
+  [(viewDate)]="viewDate"
+  (viewDateChange)="fetchEvents()"
+  (viewChange)="fetchEvents()">
+</app-calendar-header>
+
+<ng-template #loading>
+  <div class="text-center">
+    <i class="fa fa-spin fa-spinner fa-5x"></i>
+    <br>
+    Loading events...
+  </div>
+</ng-template>
+
+<div *ngIf="agendamentos; else loading; let events">
+  <div [ngSwitch]="view">
+    <mwl-calendar-month-view
+      [locale]="'pt-PT'"
+      *ngSwitchCase="'month'"
+      [viewDate]="viewDate"
+      [events]="events"
+      [activeDayIsOpen]="activeDayIsOpen"
+      (dayClicked)="dayClicked($event.day)"
+      (eventClicked)="eventClicked($event.event)">
+    </mwl-calendar-month-view>
+    <mwl-calendar-week-view
+      [locale]="'pt-PT'"
+      *ngSwitchCase="'week'"
+      [viewDate]="viewDate"
+      [events]="events"
+      (eventClicked)="eventClicked($event.event)">
+    </mwl-calendar-week-view>
+    <mwl-calendar-day-view
+      [locale]="'pt-PT'"
+      *ngSwitchCase="'day'"
+      [viewDate]="viewDate"
+      [events]="events"
+      (hourSegmentClicked)="hourClicked($event.date)"
+      (eventClicked)="eventClicked($event.event)">
+    </mwl-calendar-day-view>
+  </div>
+</div>

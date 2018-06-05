@@ -1,0 +1,74 @@
+<form [formGroup]="searchForm" (ngSubmit)="onSubmit()">  
+  <div class="row form-group" >
+      <div class="col-md-6">
+      <label for="nome">Nome</label>
+      <input type="text" formControlName="nome" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.nome.errors }" />
+      <div *ngIf="submitted && f.nome.errors" class="invalid-feedback">
+          <div *ngIf="f.nome.errors.required">Campo Obrigatório!</div>
+      </div>
+      </div>
+      <div class="col-md-3">
+          <label for="cpf">CPF</label>
+          <input mask='999.999.999-99' type="text" formControlName="cpf" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.cpf.errors }" />
+          <div *ngIf="submitted && f.cpf.errors" class="invalid-feedback">
+              <div *ngIf="f.cpf.errors.required">Campo Obrigatório!</div>
+              <div *ngIf="f.cpf.errors.minlength">CPF inválido!</div>
+          </div>
+      </div>
+  </div>
+  <div class="form-group">
+    <button class="btn btn-outline-primary btn-lg">Buscar</button>&nbsp;
+    <button type="reset" class="btn btn-outline-danger btn-lg">Limpar</button>
+  </div>
+</form>
+
+<table class="table">
+  <thead class="thead-light">
+    <tr class="text-center">
+      <th scope="col">Nome</th>
+      <th scope="col">CPF</th>
+      <th scope="col">Telefone</th>
+      <th scope="col">Ações</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="text-center" *ngFor="let customer of customers | paginate: { id: 'server', itemsPerPage: 10, currentPage: pagination.page, totalItems: pagination.totalItems }">
+      <td>{{customer.Nome}}</td>
+      <td>{{customer.Cpf}}</td>
+      <td>{{customer.Telefone}}</td>
+      <td>
+        <button (click)="edit(customer.Id)" class="btn btn-sm btn-outline-info">
+          <span class="fa fa-edit">
+          </span>
+        </button>&nbsp;
+        <button (click)="confirmDelete(content, customer.Id)" class="btn btn-sm btn-outline-info">
+            <span class="fa fa-trash">
+            </span>
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<div class="text-center">
+    <pagination-controls 
+    (pageChange)="getPage($event)" 
+    id="server"
+    previousLabel=""
+    nextLabel=""
+    >
+    </pagination-controls>
+</div>
+
+<ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header bg-light">
+      <h4 class="modal-title">Confirmação</h4>
+    </div>
+    <div class="modal-body">
+      <p>Confirma a exclusão?</p>
+    </div>
+    <div class="modal-footer">
+      <button (click)="delete();" class="btn btn-outline-success">Sim</button>
+      <button (click)="c()" class="btn btn-outline-danger">Não</button>
+    </div>
+</ng-template>
+

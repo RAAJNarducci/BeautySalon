@@ -1,0 +1,112 @@
+<form [formGroup]="customerForm" (ngSubmit)="onSubmit()">
+  
+<fieldset>
+    <legend>Dados pessoais</legend>
+        <div class="row form-group">
+            <div class="col-md-6">
+            <label for="nome">Nome</label>
+            <input type="text" formControlName="nome" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.nome.errors }" />
+            <div *ngIf="submitted && f.nome.errors" class="invalid-feedback">
+                <div *ngIf="f.nome.errors.required">Campo Obrigatório!</div>
+            </div>
+            </div>
+            <div class="col-md-3">
+                <label for="cpf">CPF</label>
+                <input mask='999.999.999-99' type="text" formControlName="cpf" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.cpf.errors }" />
+                <div *ngIf="submitted && f.cpf.errors" class="invalid-feedback">
+                    <div *ngIf="f.cpf.errors.required">Campo Obrigatório!</div>
+                    <div *ngIf="f.cpf.errors.minlength">CPF inválido!</div>
+                </div>
+            </div>
+        </div>
+        <div class="row form-group">
+                <div class="col-md-3">
+                  <label for="dataNascimento">Data Nascimento</label>
+                  <input mask='99/99/9999' type="text" formControlName="dataNascimento" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.dataNascimento.errors }" />
+                  <div *ngIf="submitted && f.dataNascimento.errors" class="invalid-feedback">
+                      <div *ngIf="f.dataNascimento.errors.required">Campo Obrigatório!</div>
+                      <div *ngIf="f.dataNascimento.errors.minlength">Data Nascimento Inválida!</div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                    <label for="telefone">Telefone/Celular</label>
+                    <input ngxPhoneMaskBr type="text" formControlName="telefone" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.telefone.errors }" />
+                    <div *ngIf="submitted && f.telefone.errors" class="invalid-feedback">
+                        <div *ngIf="f.telefone.errors.required">Campo Obrigatório!</div>
+                        <div *ngIf="f.telefone.errors.minlength">Telefone/Celular inválido!</div>
+                    </div>
+                </div>
+        </div>
+</fieldset>
+
+<fieldset>
+    <legend>Endereço</legend>
+        <div class="row form-group">
+            <div class="col-md-3">
+                <label for="cep">CEP</label>
+                <input mask='99999-999' type="text" formControlName="cep" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.cep.errors }" />
+                <div *ngIf="submitted && f.cep.errors" class="invalid-feedback">
+                        <div *ngIf="f.cep.errors.required">Campo Obrigatório!</div>
+                        <div *ngIf="f.cep.errors.minlength">CEP inválido!</div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <label for="_uf">Estado</label>
+                <select class="form-control" formControlName="uf" [ngClass]="{ 'is-invalid': submitted && f.uf.errors }">
+                    <option value="">N/A</option>
+                    <option *ngFor="let uf of ufsData" [value]="uf.value">
+                        {{ uf.value | uppercase }}
+                    </option>
+                </select>
+                <div *ngIf="submitted && f.uf.errors" class="invalid-feedback">
+                        <div *ngIf="f.uf.errors.required">Campo Obrigatório!</div>
+                        <div *ngIf="f.uf.errors.minlength">CEP inválido!</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row form-group">
+                <div class="col-md-6">
+                    <label for="logradouro">Logradouro</label>
+                    <input type="text" formControlName="logradouro" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.logradouro.errors }" />
+                    <div *ngIf="submitted && f.logradouro.errors" class="invalid-feedback">
+                        <div *ngIf="f.logradouro.errors.required">Campo Obrigatório!</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label for="bairro">Bairro</label>
+                    <input type="text" formControlName="bairro" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.bairro.errors }" />
+                    <div *ngIf="submitted && f.bairro.errors" class="invalid-feedback">
+                        <div *ngIf="f.bairro.errors.required">Campo Obrigatório!</div>
+                    </div>
+                </div>
+        </div>
+        <div class="row form-group">
+                <div class="col-md-2">
+                    <label for="numero">Número</label>
+                    <input mask='9999999999' type="text" formControlName="numero" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.numero.errors }" />
+                    <div *ngIf="submitted && f.numero.errors" class="invalid-feedback">
+                        <div *ngIf="f.numero.errors.required">Campo Obrigatório!</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label for="cidade">Cidade</label>
+                    <input type="text" formControlName="cidade" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.cidade.errors }" />
+                    <div *ngIf="submitted && f.cidade.errors" class="invalid-feedback">
+                        <div *ngIf="f.cidade.errors.required">Campo Obrigatório!</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                        <label for="complemento">Complemento</label>
+                        <input type="text" formControlName="complemento" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.complemento.errors }" />
+                        <div *ngIf="submitted && f.complemento.errors" class="invalid-feedback">
+                            <div *ngIf="f.complemento.errors.required">Campo Obrigatório!</div>
+                        </div>
+                </div>
+        </div>
+</fieldset>
+  <div class="form-group">
+      <button class="btn btn-outline-primary btn-lg">Salvar</button>&nbsp;
+      <button type="reset" class="btn btn-outline-danger btn-lg">Limpar</button>
+  </div>
+</form>

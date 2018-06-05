@@ -1,0 +1,33 @@
+<form [formGroup]="jobForm" (ngSubmit)="onSubmit()">
+    <div class="row form-group">
+        <div class="col-md-6">
+            <label for="descricao">Descrição</label>
+            <input type="text" formControlName="descricao" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.descricao.errors }" />
+            <div *ngIf="submitted && f.descricao.errors" class="invalid-feedback">
+                <div *ngIf="f.descricao.errors.required">Campo Obrigatório!</div>
+            </div>
+        </div>
+    </div>
+    <div class="row form-group">
+        <div class="col-md-3">
+            <label for="tempoPrevisto">Tempo Previsto (Em minutos)</label>
+            <input mask='9999' type="text" formControlName="tempoPrevisto" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.tempoPrevisto.errors }" />
+            <div *ngIf="submitted && f.tempoPrevisto.errors" class="invalid-feedback">
+                <div *ngIf="f.tempoPrevisto.errors.required">Campo Obrigatório!</div>
+            </div>
+        </div>
+    </div>
+    <div class="row form-group">
+        <div class="col-md-3">
+            <label for="valor">Valor</label>
+            <input currencyMask type="text" formControlName="valor" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.valor.errors }" />
+            <div *ngIf="submitted && f.valor.errors" class="invalid-feedback">
+                <div *ngIf="f.valor.errors.required">Campo Obrigatório!</div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <button class="btn btn-outline-primary btn-lg">Salvar</button>&nbsp;
+        <button type="reset" class="btn btn-outline-danger btn-lg">Limpar</button>
+    </div>
+</form>
