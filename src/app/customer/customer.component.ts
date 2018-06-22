@@ -42,7 +42,8 @@ export class CustomerComponent implements OnInit, OnDestroy {
       if (params['id']) {
         this.customerForm.patchValue({
           nome: 'Relson',
-          cpf: '41281804835'
+          cpf: '41281804835',
+          dataNascimento: '13051994'
         });
       }
     });

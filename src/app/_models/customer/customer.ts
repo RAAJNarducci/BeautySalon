@@ -22,3 +22,8 @@ export interface ICustomerResponse {
     customers: ICustomer[];
     totalItens: number;
 }
+
+export interface ICustomerGet {
+    Id: number;
+    Nome: string;
+}
