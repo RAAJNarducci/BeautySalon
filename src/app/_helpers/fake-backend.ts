@@ -16,7 +16,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
         return of(null).pipe(mergeMap(() => {
 
             // authenticate
-            if (request.url.endsWith('/api/authenticate') && request.method === 'POST') {
+            if (request.url.endsWith('http://localhost:57911/api/login') && request.method === 'POST') {
                 // find if any user matches login credentials
                 const filteredUsers = users.filter(user => {
                     return user.username === request.body.username && user.password === request.body.password;
@@ -42,7 +42,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
 
             // get users
             if (request.url.endsWith('/api/users') && request.method === 'GET') {
-                if (request.headers.get('Authorization') === 'Bearer fake-jwt-token') {
+                if (request.headers.get('Authorization')) {
                     return of(new HttpResponse({ status: 200, body: users }));
                 } else {
                     // return 401 not authorised if token is null or invalid

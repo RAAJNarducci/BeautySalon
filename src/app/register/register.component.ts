@@ -23,9 +23,8 @@ export class RegisterComponent implements OnInit {
 
     ngOnInit() {
         this.registerForm = this.formBuilder.group({
-            firstName: ['', Validators.required],
-            lastName: ['', Validators.required],
-            username: ['', Validators.required],
+            name: ['', Validators.required],
+            email: ['', Validators.required],
             password: ['', [Validators.required, Validators.minLength(6)]]
         });
     }
@@ -36,7 +35,6 @@ export class RegisterComponent implements OnInit {
     onSubmit() {
         this.submitted = true;
 
-        // stop here if form is invalid
         if (this.registerForm.invalid) {
             return;
         }
