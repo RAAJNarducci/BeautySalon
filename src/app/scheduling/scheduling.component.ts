@@ -3,7 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { CalendarEvent, CalendarDateFormatter, CalendarEventTitleFormatter } from 'angular-calendar';
 import {
   isSameMonth,
-  isSameDay
+  isSameDay,
+  addMinutes,
 } from 'date-fns';
 import { Observable } from 'rxjs';
 import { colors } from '../_directives/calendar/colors';
@@ -11,31 +12,9 @@ import { CustomDateFormatter } from '../_directives/calendar/custom-date-formatt
 import { CustomEventTitleFormatter } from '../_directives/calendar/custom-title-formatter';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { IJob, ICustomerGet } from '../_models';
-
-interface AgendamentoResponse {
-  Id: number;
-  NomeCliente: string;
-  DescricaoServico: string;
-  HorarioInicio: string;
-  Minutos: number;
-  DataFormatada: string;
-}
-
-interface Agendamento {
-  Id: number;
-  DataAgendamento: string;
-  HorarioAgendamento: string;
-  IdCliente: number;
-  IdServico: number;
-  TempoPrevisto: number;
-}
-
-export const jobs: IJob[] = [
-  {'Id': 1, 'Descricao': 'Corte', 'TempoPrevisto': 60, 'Valor': 60.0 },
-  {'Id': 2, 'Descricao': 'Pintura', 'TempoPrevisto': 90, 'Valor': 100.0 },
-  {'Id': 3, 'Descricao': 'Escova', 'TempoPrevisto': 120, 'Valor': 150.0 },
-];
+import { IJob, ICustomerGet, IAgendamentoResponse, IAgendamento } from '../_models';
+import { SchedulingService } from '../_services/scheduling.service';
+import { map } from 'rxjs/operators';
 
 export const customers: ICustomerGet[] = [
   {'Id': 1, 'Nome': 'João', },
@@ -64,11 +43,11 @@ export class SchedulingComponent implements OnInit {
   submitted = false;
   view = 'month';
   customers = customers;
-  jobs = jobs;
+  jobs = [];
   schedulingForm: FormGroup;
   viewDate: Date = new Date();
-  events: Observable<Array<CalendarEvent<{ agendamento: AgendamentoResponse }>>>;
-  agendamentos: CalendarEvent[];
+  events: Observable<Array<CalendarEvent<{ agendamento: IAgendamentoResponse }>>>;
+  agendamentos: CalendarEvent[] = [];
 
 
 
@@ -76,9 +55,11 @@ export class SchedulingComponent implements OnInit {
     private http: HttpClient,
     private modalService: NgbModal,
     private formBuilder: FormBuilder,
+    private schedulingService: SchedulingService
   ) {}
 
   ngOnInit(): void {
+    this.listarServicos();
     this.schedulingForm = this.formBuilder.group({
       dataAgendamento: ['', Validators.required],
       horarioAgendamento: ['', Validators.required],
@@ -86,7 +67,18 @@ export class SchedulingComponent implements OnInit {
       idServico: ['', Validators.required],
       tempoPrevisto: ['', Validators.required],
     });
-    this.obterAgendamentos();
+    this.schedulingService.getByDate(this.viewDate)
+    .pipe(
+      map(ag =>
+        this.agendamentos = this.converterAgendamentoEvento(ag))
+    ).subscribe();
+  }
+
+  listarServicos() {
+    this.schedulingService.listarServicos()
+      .pipe(
+        map(se => this.jobs = se)
+      ).subscribe();
   }
 
   onSubmit() {
@@ -95,15 +87,14 @@ export class SchedulingComponent implements OnInit {
             return;
     }
     const form = this.schedulingForm.controls;
-    const ag: Agendamento = {
-      DataAgendamento: form.dataAgendamento.value,
-      HorarioAgendamento: form.horarioAgendamento.value,
-      IdCliente: form.idCliente.value,
-      IdServico: form.idServico.value,
-      TempoPrevisto: form.tempoPrevisto.value,
-      Id: 0
+    const ag: IAgendamento = {
+      dataAgendamento: form.dataAgendamento.value,
+      horarioAgendamento: form.horarioAgendamento.value,
+      idCliente: form.idCliente.value,
+      idServico: form.idServico.value,
+      tempoPrevisto: form.tempoPrevisto.value,
+      id: 0
     };
-    console.log(ag);
 
     this.agendamentos.push({
       title: 'teste ' + ' / ' + 'corte degladê',
@@ -116,45 +107,30 @@ export class SchedulingComponent implements OnInit {
     });
   }
 
-  obterAgendamentos(): void {
-    const agendamentosMock: AgendamentoResponse[] = [{
-        Id: 1,
-        DataFormatada: '06-04-2018',
-        HorarioInicio: '10:00:00',
-        Minutos: 60,
-        NomeCliente: 'Rita',
-        DescricaoServico: 'Corte + Pintura'
-      },
-      {
-        Id: 2,
-        DataFormatada: '06-04-2018',
-        HorarioInicio: '11:00:00',
-        Minutos: 60,
-        NomeCliente: 'Patrícia',
-        DescricaoServico: 'Escova'
-      }
-    ];
-    const eventMock: CalendarEvent[] = [
-      {
-        title: agendamentosMock[0].NomeCliente + ' / ' + agendamentosMock[0].DescricaoServico,
-        start: new Date(2018, 5, 4, 10, 30, 0, 0),
-        end: new Date(2018, 5, 4, 11, 0, 0, 0),
-        color: colors.yellow,
-        meta: {
-          agendamento: agendamentosMock[0]
-        }
-      },
-      {
-        title: agendamentosMock[1].NomeCliente + ' / ' + agendamentosMock[1].DescricaoServico,
-        start: new Date(2018, 5, 4, 11, 0, 0, 0),
-        end: new Date(2018, 5, 4, 12, 0, 0, 0),
-        color: colors.yellow,
-        meta: {
-          agendamento: agendamentosMock[1]
-        }
-      },
-    ];
-    this.agendamentos = eventMock;
+  converterAgendamentoEvento(agendamento: IAgendamentoResponse[]) {
+    const listaAgendamentos = [];
+    agendamento.forEach(el => {
+      const data = el.dataFormatada.split('/');
+      const mes = parseInt(data[1], 0);
+      const hora = el.horarioInicio.split(':');
+      const horarioInicio = new Date(
+        +data[2],
+        mes - 1,
+        +data[0],
+        +hora[0],
+        +hora[1]);
+      const evento: CalendarEvent = {
+          title: el.nomeCliente + ' / ' + el.descricaoServico,
+          start: horarioInicio,
+          end: addMinutes(horarioInicio, el.minutos),
+          color: colors.yellow,
+          meta: {
+            agendamento: el
+          }
+      };
+      listaAgendamentos.push(evento);
+    });
+    return listaAgendamentos;
   }
 
   get f() { return this.schedulingForm.controls; }
@@ -164,7 +140,7 @@ export class SchedulingComponent implements OnInit {
     events
   }: {
     date: Date;
-    events: Array<CalendarEvent<{ agendamento: AgendamentoResponse }>>;
+    events: Array<CalendarEvent<{ agendamento: IAgendamentoResponse }>>;
   }): void {
     if (!events.length) {
       this.viewDate = date;
@@ -195,7 +171,7 @@ export class SchedulingComponent implements OnInit {
 
   }
 
-  eventClicked(event: CalendarEvent<{ agendamento: AgendamentoResponse }>): void {
+  eventClicked(event: CalendarEvent<{ agendamento: IAgendamentoResponse }>): void {
     console.log(event.meta.agendamento);
   }
 
@@ -228,10 +204,10 @@ export class SchedulingComponent implements OnInit {
   setTime() {
     const idServico = this.schedulingForm.controls['idServico'].value;
     if (+idServico) {
-      const timeJob = jobs.find(x => x.Id === +idServico);
+      const timeJob = this.jobs.find(x => x.id === +idServico);
       if (timeJob) {
         this.schedulingForm.patchValue({
-          tempoPrevisto: timeJob.TempoPrevisto
+          tempoPrevisto: timeJob.tempoPrevisto
         });
       }
     }

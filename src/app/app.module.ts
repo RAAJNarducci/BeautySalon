@@ -7,7 +7,7 @@ import ptBr from '@angular/common/locales/pt';
 registerLocaleData(ptBr);
 
 // used to create fake backend
-import { fakeBackendProvider } from './_helpers';
+import { fakeBackendProvider, ErrorHandler } from './_helpers';
 import { AlertComponent } from './_directives';
 import { AuthGuard } from './_guards';
 import { JwtInterceptor } from './_helpers';
@@ -37,6 +37,8 @@ import { CustomerListComponent } from './customer-list/customer-list.component';
 import { JobComponent } from './job/job.component';
 import { JobListComponent } from './job-list/job-list.component';
 import { SchedulingComponent } from './scheduling/scheduling.component';
+import { SchedulingService } from './_services/scheduling.service';
+import { ConfigComponent } from './config/config.component';
 
 
 export const CustomCurrencyMaskConfig: CurrencyMaskConfig = {
@@ -63,7 +65,8 @@ export const CustomCurrencyMaskConfig: CurrencyMaskConfig = {
     CustomerListComponent,
     JobComponent,
     JobListComponent,
-    SchedulingComponent
+    SchedulingComponent,
+    ConfigComponent
   ],
   imports: [
     BrowserModule,
@@ -93,10 +96,17 @@ export const CustomCurrencyMaskConfig: CurrencyMaskConfig = {
     },
     ViacepService,
     CustomerService,
+    SchedulingService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: JwtInterceptor,
+      multi: true
+    },
     // provider used to create fake backend
-    fakeBackendProvider,
+    // fakeBackendProvider,
     { provide: CURRENCY_MASK_CONFIG, useValue: CustomCurrencyMaskConfig },
-    { provide: LOCALE_ID, useValue: 'pt' }
+    { provide: LOCALE_ID, useValue: 'pt' },
+    ErrorHandler
   ],
   bootstrap: [AppComponent]
 })

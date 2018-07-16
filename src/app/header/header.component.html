@@ -34,9 +34,16 @@
               </div>
           </li>
       </div>
-      <li class="nav-item">
-        <a [routerLink]="['/scheduling']" class="nav-link">Agendamentos</a>
-      </li>
+      <div *ngIf="currentUser">
+          <li class="nav-item">
+            <a [routerLink]="['/scheduling']" class="nav-link">Agendamentos</a>
+          </li>
+      </div>
+      <div *ngIf="currentUser">
+        <li class="nav-item">
+          <a [routerLink]="['/config']" class="nav-link">Agendamentos</a>
+        </li>
+    </div>
     </ul>
       <button *ngIf="!currentUser" class="btn btn-outline-info my-2 my-sm-0" type="button" [routerLink]="['/login']">Logar-se</button>
       <div *ngIf="currentUser">

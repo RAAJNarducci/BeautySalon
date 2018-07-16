@@ -9,18 +9,21 @@ import { CustomerListComponent } from './customer-list/customer-list.component';
 import { JobComponent } from './job/job.component';
 import { JobListComponent } from './job-list/job-list.component';
 import { SchedulingComponent } from './scheduling/scheduling.component';
+import { ConfigComponent } from './config/config.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent, canActivate: [AuthGuard] },
-  { path: 'customer', component: CustomerComponent},
-  { path: 'customer/:id', component: CustomerComponent},
-  { path: 'customer-list', component: CustomerListComponent},
+  { path: 'customer', component: CustomerComponent, canActivate: [AuthGuard] },
+  { path: 'customer/:id', component: CustomerComponent, canActivate: [AuthGuard] },
+  { path: 'customer-list', component: CustomerListComponent, canActivate: [AuthGuard] },
 
-  { path: 'job', component: JobComponent},
-  { path: 'job/:id', component: JobComponent},
-  { path: 'job-list', component: JobListComponent},
+  { path: 'job', component: JobComponent, canActivate: [AuthGuard] },
+  { path: 'job/:id', component: JobComponent, canActivate: [AuthGuard] },
+  { path: 'job-list', component: JobListComponent, canActivate: [AuthGuard] },
 
-  { path: 'scheduling', component: SchedulingComponent},
+  { path: 'scheduling', component: SchedulingComponent, canActivate: [AuthGuard] },
+
+  { path: 'config', component: ConfigComponent },
 
   { path: 'login', component: LoginComponent},
   { path: 'register', component: RegisterComponent },
