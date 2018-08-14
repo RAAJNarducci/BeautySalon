@@ -1,8 +1,8 @@
 export interface IJob {
-    Id: number;
-    Descricao: string;
-    TempoPrevisto: number;
-    Valor: number;
+    id: number;
+    descricao: string;
+    tempoPrevisto: number;
+    valor: number;
 }
 
 

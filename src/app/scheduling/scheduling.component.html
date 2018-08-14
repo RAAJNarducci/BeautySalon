@@ -21,14 +21,14 @@
       [events]="events"
       [activeDayIsOpen]="activeDayIsOpen"
       (dayClicked)="dayClicked($event.day)"
-      (eventClicked)="eventClicked($event.event)">
+      (eventClicked)="eventClicked($event.event, content)">
     </mwl-calendar-month-view>
     <mwl-calendar-week-view
       [locale]="'pt-PT'"
       *ngSwitchCase="'week'"
       [viewDate]="viewDate"
       [events]="events"
-      (eventClicked)="eventClicked($event.event)">
+      (eventClicked)="eventClicked($event.event, content)">
     </mwl-calendar-week-view>
     <mwl-calendar-day-view
       [locale]="'pt-PT'"
@@ -36,7 +36,7 @@
       [viewDate]="viewDate"
       [events]="events"
       (hourSegmentClicked)="hourClicked(content, $event.date)"
-      (eventClicked)="eventClicked($event.event)"
+      (eventClicked)="eventClicked($event.event, content)"
       [dayStartHour]="7"
       [dayEndHour]="22">
     </mwl-calendar-day-view>
@@ -56,7 +56,7 @@
             <input mask='99/99/9999' type="text" formControlName="dataAgendamento" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.dataAgendamento.errors }" readonly />
             <div *ngIf="submitted && f.dataAgendamento.errors" class="invalid-feedback">
                 <div *ngIf="f.dataAgendamento.errors.required">Campo Obrigatório!</div>
-                <div *ngIf="f.dataAgendamento.errors.minlength">Data Nascimento Inválida!</div>
+                <div *ngIf="f.dataAgendamento.errors.minlength">Data Agendamento Inválida!</div>
             </div>
           </div>
           <div class="col-md-3">
@@ -70,10 +70,10 @@
         <div class="row form-group">
           <div class="col-md-6">
             <label for="_uf">Cliente</label>
-            <select class="form-control" formControlName="idCliente" [ngClass]="{ 'is-invalid': submitted && f.idCliente.errors }">
+            <select class="form-control" formControlName="idCliente" [ngClass]="{ 'is-invalid': submitted && f.idCliente.errors }" [attr.disabled]="editScheduling">
                 <option value="">N/A</option>
-                <option *ngFor="let customer of customers" [value]="customer.Id">
-                    {{customer.Nome}}
+                <option *ngFor="let customer of customers" [value]="customer.id">
+                    {{customer.nome}}
                 </option>
             </select>
             <div *ngIf="submitted && f.idCliente.errors" class="invalid-feedback">
@@ -84,7 +84,7 @@
         <div class="row form-group">
             <div class="col-md-6">
               <label for="_uf">Serviço</label>
-              <select (change)="setTime()" class="form-control" formControlName="idServico" [ngClass]="{ 'is-invalid': submitted && f.idServico.errors }">
+              <select (change)="setTime()" class="form-control" formControlName="idServico" [ngClass]="{ 'is-invalid': submitted && f.idServico.errors }" [attr.disabled]="editScheduling">
                   <option value="">N/A</option>
                   <option *ngFor="let job of jobs" [value]="job.id">
                       {{job.descricao}}
@@ -96,17 +96,24 @@
             </div>
             <div class="col-md-3">
               <label for="tempoPrevisto">Tempo Previsto</label>
-              <input mask="999" type="text" formControlName="tempoPrevisto" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.tempoPrevisto.errors }" />
+              <input mask="999" type="text" formControlName="tempoPrevisto" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.tempoPrevisto.errors }" [attr.disabled]="editScheduling" />
               <div *ngIf="submitted && f.tempoPrevisto.errors" class="invalid-feedback">
                   <div *ngIf="f.tempoPrevisto.errors.required">Campo Obrigatório!</div>
               </div>
             </div>
         </div>
+        <div *ngIf="editScheduling" class="row form-group">
+            <div class="col-md-6">
+                <label class="control-label">Status: {{statusScheduling}}</label>
+            </div>
+        </div>
     
     </div>
     <div class="modal-footer">
-      <button class="btn btn-outline-success">Salvar</button>
-      <button (click)="c()" class="btn btn-outline-danger">Cancelar</button>
+      <button *ngIf="!editScheduling" class="btn btn-outline-success">Salvar</button>
+      <button *ngIf="editScheduling" (click)="editStatus(2)" class="btn btn-outline-secondary">Concluir</button>
+      <button *ngIf="editScheduling" (click)="closeModal(3)" class="btn btn-outline-secondary">Desmarcar</button>
+      <button (click)="closeModal()" class="btn btn-outline-danger">Fechar</button>
     </div>
   </form>
 </ng-template>

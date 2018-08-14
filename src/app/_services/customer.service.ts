@@ -4,49 +4,51 @@ import { HttpClient } from '@angular/common/http';
 import { User } from '../_models';
 import { ISearchCustomerParams, ICustomer, ICustomerResponse } from '../_models/customer/customer';
 import { Observable, of} from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
+import { ErrorHandler } from '../_helpers';
 
 @Injectable()
 export class CustomerService {
     customers: ICustomer[];
 
-    constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient,
+        private errorHandler: ErrorHandler) {}
 
-    searchCustomer(params: ISearchCustomerParams):
-    Observable<{ customers: ICustomer[], totalItems: number }> {
+    buscarPessoas(params: ISearchCustomerParams, pagination: any) {
+        const queryParams = Object.keys(params)
+        .filter(key => params[key] || params[key] === false)
+        .map(key => `${key}=${params[key]}`)
+        .join('&');
 
-    const queryParams = Object.keys(params)
-      .filter(key => params[key] || params[key] === false)
-      .map(key => `${key}=${params[key]}`)
-      .join('&');
+        const queryPagination = Object.keys(pagination)
+        .filter(key => pagination[key] || pagination[key] === false)
+        .map(key => `${key}=${pagination[key]}`)
+        .join('&');
 
-    const url = `/customer/search?${queryParams}`;
-    return this.http
-        .get<ICustomerResponse>(url)
+        return this.http.get<ICustomerResponse>(`http://localhost:57911/api/Pessoa/BuscarPessoas?${queryParams}&${queryPagination}`)
         .pipe(
-            map(customer => {
-                return { customers: this.getMock(), totalItems: this.getMock().length };
-            })
+            catchError(this.errorHandler.getError)
         );
     }
 
-    getMock() {
-        const cliente: ICustomer[] = [{
-            Id: 1,
-            Bairro: 'Centro',
-            Cep: '14801790',
-            Cidade: 'Araraquara',
-            Complemento: 'Ap',
-            Cpf: '41281804877',
-            DataNascimento: '13051994',
-            Logradouro: 'Rua 1',
-            Nome: 'Relson',
-            Numero: '123',
-            Telefone: '1632569874',
-            Uf: 'SP'
-          }
-        ];
+    buscarPorId(id: number) {
+        return this.http.get<ICustomer>(`http://localhost:57911/api/Pessoa/GetById?id=${id}`)
+        .pipe(
+            catchError(this.errorHandler.getError)
+        );
+    }
 
-        return cliente;
+    post(customer: ICustomer) {
+        return this.http.post<any> (`http://localhost:57911/api/Pessoa`, customer)
+        .pipe(
+            catchError(this.errorHandler.getError)
+        );
+    }
+
+    put(customer: ICustomer) {
+        return this.http.put<any> (`http://localhost:57911/api/Pessoa`, customer)
+        .pipe(
+            catchError(this.errorHandler.getError)
+        );
     }
 }

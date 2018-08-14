@@ -10,17 +10,18 @@ import { Observable } from 'rxjs';
 import { colors } from '../_directives/calendar/colors';
 import { CustomDateFormatter } from '../_directives/calendar/custom-date-formatter';
 import { CustomEventTitleFormatter } from '../_directives/calendar/custom-title-formatter';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IJob, ICustomerGet, IAgendamentoResponse, IAgendamento } from '../_models';
 import { SchedulingService } from '../_services/scheduling.service';
 import { map } from 'rxjs/operators';
+import { ToastrService } from 'ngx-toastr';
+import { EnumCores } from '../_helpers';
 
 export const customers: ICustomerGet[] = [
-  {'Id': 1, 'Nome': 'João', },
-  {'Id': 2, 'Nome': 'Maria'},
+  {'id': 1, 'nome': 'João', },
+  {'id': 2, 'nome': 'Maria'},
 ];
-
 
 @Component({
   selector: 'app-scheduling',
@@ -48,30 +49,30 @@ export class SchedulingComponent implements OnInit {
   viewDate: Date = new Date();
   events: Observable<Array<CalendarEvent<{ agendamento: IAgendamentoResponse }>>>;
   agendamentos: CalendarEvent[] = [];
-
-
+  modalRef: NgbModalRef;
+  editScheduling = null;
+  statusScheduling = '';
 
   constructor(
-    private http: HttpClient,
+    private toastr: ToastrService,
     private modalService: NgbModal,
     private formBuilder: FormBuilder,
     private schedulingService: SchedulingService
   ) {}
 
+  get f() { return this.schedulingForm.controls; }
+
   ngOnInit(): void {
-    this.listarServicos();
     this.schedulingForm = this.formBuilder.group({
+      id: [0, Validators.required],
       dataAgendamento: ['', Validators.required],
       horarioAgendamento: ['', Validators.required],
       idCliente: ['', Validators.required],
       idServico: ['', Validators.required],
       tempoPrevisto: ['', Validators.required],
     });
-    this.schedulingService.getByDate(this.viewDate)
-    .pipe(
-      map(ag =>
-        this.agendamentos = this.converterAgendamentoEvento(ag))
-    ).subscribe();
+    this.listarServicos();
+    this.getByDate();
   }
 
   listarServicos() {
@@ -79,6 +80,37 @@ export class SchedulingComponent implements OnInit {
       .pipe(
         map(se => this.jobs = se)
       ).subscribe();
+  }
+
+  getByDate() {
+    this.schedulingService.getByDate(this.viewDate)
+    .pipe(
+      map(ag =>
+        this.agendamentos = this.converterAgendamentoEvento(ag))
+    ).subscribe();
+  }
+
+  closeModal() {
+    this.schedulingForm.reset();
+    this.schedulingForm.patchValue({
+      idCliente: '',
+      idServico: ''
+    });
+    this.modalRef.close();
+  }
+
+  save(agendamento: IAgendamento) {
+    this.schedulingService.post(agendamento)
+    .subscribe(
+      () => {
+        this.closeModal();
+        this.toastr.success('Agendamento realizado', 'Sucesso!');
+      },
+      err => console.log(err)
+    );
+  }
+
+  editStatus(status) {
   }
 
   onSubmit() {
@@ -90,21 +122,13 @@ export class SchedulingComponent implements OnInit {
     const ag: IAgendamento = {
       dataAgendamento: form.dataAgendamento.value,
       horarioAgendamento: form.horarioAgendamento.value,
-      idCliente: form.idCliente.value,
-      idServico: form.idServico.value,
-      tempoPrevisto: form.tempoPrevisto.value,
-      id: 0
+      idCliente: parseInt(form.idCliente.value, 0),
+      idServico: parseInt(form.idServico.value, 0),
+      tempoPrevisto: parseInt(form.tempoPrevisto.value, 0),
+      id: form.id.value
     };
 
-    this.agendamentos.push({
-      title: 'teste ' + ' / ' + 'corte degladê',
-      start: new Date(2018, 5, 21, 14, 15, 0, 0),
-      end: new Date(2018, 5, 21, 15, 0, 0, 0),
-      color: colors.yellow,
-      meta: {
-        agendamento: 3
-      }
-    });
+    this.save(ag);
   }
 
   converterAgendamentoEvento(agendamento: IAgendamentoResponse[]) {
@@ -120,10 +144,10 @@ export class SchedulingComponent implements OnInit {
         +hora[0],
         +hora[1]);
       const evento: CalendarEvent = {
-          title: el.nomeCliente + ' / ' + el.descricaoServico,
+          title: el.cliente.nome + ' / ' + el.servico.descricao,
           start: horarioInicio,
           end: addMinutes(horarioInicio, el.minutos),
-          color: colors.yellow,
+          color: el.statusAgendamento.id === 1 ? colors.yellow : el.statusAgendamento.id === 2 ? colors.blue : colors.red,
           meta: {
             agendamento: el
           }
@@ -132,8 +156,6 @@ export class SchedulingComponent implements OnInit {
     });
     return listaAgendamentos;
   }
-
-  get f() { return this.schedulingForm.controls; }
 
   dayClicked({
     date,
@@ -162,17 +184,25 @@ export class SchedulingComponent implements OnInit {
   hourClicked(content, data: any) {
     this.schedulingForm.patchValue({
       dataAgendamento: this.formatDate(data),
-      horarioAgendamento: this.formatYour(data)
+      horarioAgendamento: this.formatYour(data),
     });
-    this.modalService.open(content, { size: 'lg' });
+    this.editScheduling = null;
+    this.modalRef = this.modalService.open(content, { size: 'lg' });
   }
 
-  openScheduling() {
-
-  }
-
-  eventClicked(event: CalendarEvent<{ agendamento: IAgendamentoResponse }>): void {
-    console.log(event.meta.agendamento);
+  eventClicked(event: CalendarEvent<{ agendamento: IAgendamentoResponse }>, content): void {
+    const { dataFormatada, horarioInicio, id, minutos, cliente, servico, statusAgendamento } = event.meta.agendamento;
+    this.schedulingForm.patchValue({
+      dataAgendamento: dataFormatada,
+      horarioAgendamento: horarioInicio,
+      idCliente: cliente.id,
+      idServico: servico.id,
+      tempoPrevisto: minutos,
+      id: id,
+    });
+    this.editScheduling = true;
+    this.statusScheduling = statusAgendamento.descricao;
+    this.modalRef = this.modalService.open(content, { size: 'lg' });
   }
 
   formatDate(data) {

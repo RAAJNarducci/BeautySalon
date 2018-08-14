@@ -1,13 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ICustomer } from '../_models';
-import { ISearchCustomerParams } from '../_models/customer/customer';
 import { ToastrService } from 'ngx-toastr';
-import { Subject, Observable, Subscription } from 'rxjs';
 import { CustomerService } from '../_services/customer.service';
-import { finalize, switchMap,  } from 'rxjs/operators';
-import { Router, Route } from '@angular/router';
-
-import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
+import { map } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
@@ -18,17 +15,19 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 export class CustomerListComponent implements OnInit {
 
   searchForm: FormGroup;
-  submitted = false;
   customers: ICustomer[];
+  submitted = false;
   id: 0;
+  totalItens: 0;
+
   pagination = {
     totalItems: 0,
-    limit: 10,
-    page: 1
+    quantidadePagina: 10,
+    pagina: 1
   };
 
   constructor(
-    private _customerService: CustomerService,
+    private customerService: CustomerService,
     private router: Router,
     private modalService: NgbModal,
     private formBuilder: FormBuilder,
@@ -40,11 +39,19 @@ export class CustomerListComponent implements OnInit {
       nome: ['', null],
       cpf: ['', Validators.minLength(11)]
     });
-    this.customers = this.getMock();
-    this.pagination.totalItems = this.getMock().length;
+    this.search();
   }
 
   get f() { return this.searchForm.controls; }
+
+  search() {
+    this.customerService.buscarPessoas(this.searchForm.value, this.pagination).pipe(
+      map(val => {
+          this.customers = val.pessoas,
+          this.pagination.totalItems = val.totalItens;
+        })
+    ).subscribe();
+  }
 
   onSubmit() {
     this.submitted = true;
@@ -66,23 +73,8 @@ export class CustomerListComponent implements OnInit {
     this.modalService.open(content);
   }
 
-  getMock() {
-    const cliente: ICustomer[] = [{
-        Id: 1,
-        Bairro: 'Centro',
-        Cep: '14801-790',
-        Cidade: 'Araraquara',
-        Complemento: 'Ap',
-        Cpf: '412.818.048-77',
-        DataNascimento: '13/05/1994',
-        Logradouro: 'Rua 1',
-        Nome: 'Relson',
-        Numero: '123',
-        Telefone: '(16)3256-9874',
-        Uf: 'SP'
-      }
-    ];
-
-    return cliente;
+  getPage(page) {
+    this.pagination.pagina = page;
+    this.search();
   }
 }

@@ -1,7 +1,11 @@
+import { ICustomer } from 'src/app/_models';
+import { IJob } from '../job/job';
+
 export interface IAgendamentoResponse {
     id: number;
-    nomeCliente: string;
-    descricaoServico: string;
+    cliente: ICustomer;
+    servico: IJob;
+    statusAgendamento: IStatusAgendamento;
     horarioInicio: string;
     minutos: number;
     dataFormatada: string;
@@ -14,4 +18,9 @@ export interface IAgendamento {
     idCliente: number;
     idServico: number;
     tempoPrevisto: number;
+  }
+
+export interface IStatusAgendamento {
+    id: number;
+    descricao: string;
   }

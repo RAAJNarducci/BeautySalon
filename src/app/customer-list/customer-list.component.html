@@ -17,7 +17,7 @@
       </div>
   </div>
   <div class="form-group">
-    <button class="btn btn-outline-primary btn-lg">Buscar</button>&nbsp;
+    <button (click)="search();" class="btn btn-outline-primary btn-lg">Buscar</button>&nbsp;
     <button type="reset" class="btn btn-outline-danger btn-lg">Limpar</button>
   </div>
 </form>
@@ -32,16 +32,16 @@
     </tr>
   </thead>
   <tbody>
-    <tr class="text-center" *ngFor="let customer of customers | paginate: { id: 'server', itemsPerPage: 10, currentPage: pagination.page, totalItems: pagination.totalItems }">
-      <td>{{customer.Nome}}</td>
-      <td>{{customer.Cpf}}</td>
-      <td>{{customer.Telefone}}</td>
+    <tr class="text-center" *ngFor="let customer of customers | paginate: { id: 'server', itemsPerPage: 10, currentPage: pagination.pagina, totalItems: pagination.totalItems }">
+      <td>{{customer.nome}}</td>
+      <td>{{customer.cpf}}</td>
+      <td>{{customer.telefone}}</td>
       <td>
-        <button (click)="edit(customer.Id)" class="btn btn-sm btn-outline-info">
+        <button (click)="edit(customer.id)" class="btn btn-sm btn-outline-info">
           <span class="fa fa-edit">
           </span>
         </button>&nbsp;
-        <button (click)="confirmDelete(content, customer.Id)" class="btn btn-sm btn-outline-info">
+        <button (click)="confirmDelete(content, customer.id)" class="btn btn-sm btn-outline-info">
             <span class="fa fa-trash">
             </span>
         </button>
@@ -51,12 +51,15 @@
 </table>
 <div class="text-center">
     <pagination-controls 
-    (pageChange)="getPage($event)" 
-    id="server"
-    previousLabel=""
-    nextLabel=""
+      (pageChange)="getPage($event)" 
+      id="server"
+      previousLabel=""
+      nextLabel=""
     >
     </pagination-controls>
+</div>
+<div class="text-center">
+  <label>Total de Registros: {{pagination.totalItems}}</label>
 </div>
 
 <ng-template #content let-c="close" let-d="dismiss">

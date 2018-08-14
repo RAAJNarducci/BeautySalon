@@ -1,5 +1,5 @@
-import { HttpClient } from '@angular/common/http';
-import { IAgendamentoResponse, IJob } from '../_models';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { IAgendamentoResponse, IJob, IAgendamento } from '../_models';
 import { map, catchError, first } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { ErrorHandler } from '../_helpers';
@@ -22,6 +22,13 @@ export class SchedulingService {
 
     listarServicos() {
         return this.http.get<IJob[]>(`http://localhost:57911/api/Agendamento/ListarServicos`)
+        .pipe(
+            catchError(this.errorHandler.getError)
+        );
+    }
+
+    post(agendamento: IAgendamento) {
+        return this.http.post<any> (`http://localhost:57911/api/Agendamento`, agendamento)
         .pipe(
             catchError(this.errorHandler.getError)
         );

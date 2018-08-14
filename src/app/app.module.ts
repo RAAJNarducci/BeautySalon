@@ -79,7 +79,10 @@ export const CustomCurrencyMaskConfig: CurrencyMaskConfig = {
     NgxPaginationModule,
     NgbModule.forRoot(),
     BrowserAnimationsModule,
-    ToastrModule.forRoot(),
+    ToastrModule.forRoot({
+      closeButton: true,
+      timeOut: 2000,
+    }),
     CurrencyMaskModule,
     CalendarModule.forRoot(),
     CalendarUtilsModule

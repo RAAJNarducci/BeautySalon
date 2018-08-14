@@ -1,29 +1,37 @@
+import { IPagination } from '../pagination/pagination';
+
 export interface ICustomer {
-    Id: number;
-    Nome: string;
-    Cpf: string;
-    DataNascimento: string;
-    Telefone: string;
-    Cep: string;
-    Uf: string;
-    Logradouro: string;
-    Bairro: string;
-    Numero: string;
-    Cidade: string;
-    Complemento: string;
+    id: number;
+    nome: string;
+    cpf: string;
+    dataNascimento: string;
+    dataNascimentoSemMascara?: string;
+    telefone: string;
+    endereco: IAdress;
+}
+
+export interface IAdress {
+    cep: string;
+    estado: string;
+    logradouro: string;
+    bairro: string;
+    numero: string;
+    cidade: string;
+    complemento: string;
 }
 
 export interface ISearchCustomerParams {
-    Nome?: string;
-    Cpf?: string;
+    nome?: string;
+    cpf?: string;
+    pagination: IPagination;
 }
 
 export interface ICustomerResponse {
-    customers: ICustomer[];
+    pessoas: ICustomer[];
     totalItens: number;
 }
 
 export interface ICustomerGet {
-    Id: number;
-    Nome: string;
+    id: number;
+    nome: string;
 }

@@ -60,10 +60,10 @@ export class JobListComponent implements OnInit {
 
   getMock() {
     const servico: IJob[] = [{
-        Id: 1,
-        Descricao: 'Corte',
-        TempoPrevisto: 60,
-        Valor: 50.00
+        id: 1,
+        descricao: 'Corte',
+        tempoPrevisto: 60,
+        valor: 50.00
       }
     ];
 
