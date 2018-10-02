@@ -29,7 +29,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 import { CurrencyMaskModule } from 'ngx-currency-mask';
 import { CalendarModule } from 'angular-calendar';
-import { CalendarUtilsModule } from '../app/_directives/calendar/calendar.module';
+import { CalendarUtilsModule } from './_directives/calendar/calendar.module';
 import { CurrencyMaskConfig, CURRENCY_MASK_CONFIG } from 'ngx-currency-mask/src/currency-mask.config';
 
 
@@ -39,6 +39,7 @@ import { JobListComponent } from './job-list/job-list.component';
 import { SchedulingComponent } from './scheduling/scheduling.component';
 import { SchedulingService } from './_services/scheduling.service';
 import { ConfigComponent } from './config/config.component';
+import { MaskCpfPipe, MaskPhonePipe } from './_pipes';
 
 
 export const CustomCurrencyMaskConfig: CurrencyMaskConfig = {
@@ -66,7 +67,9 @@ export const CustomCurrencyMaskConfig: CurrencyMaskConfig = {
     JobComponent,
     JobListComponent,
     SchedulingComponent,
-    ConfigComponent
+    ConfigComponent,
+    MaskCpfPipe,
+    MaskPhonePipe
   ],
   imports: [
     BrowserModule,

@@ -47,7 +47,11 @@ export class LoginComponent implements OnInit {
           .pipe(first())
           .subscribe(
               data => {
-                  window.location.href = this.returnUrl;
+                  if (data) {
+                    window.location.href = this.returnUrl;
+                  } else {
+                    this.alertService.error('Login/Senha Inválidos!');
+                  }
               },
               error => {
                   this.alertService.error(error);

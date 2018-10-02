@@ -51,4 +51,11 @@ export class CustomerService {
             catchError(this.errorHandler.getError)
         );
     }
+
+    delete(id: number) {
+        return this.http.delete<any>(`http://localhost:57911/api/Pessoa?idPessoa=${id}`)
+        .pipe(
+            catchError(this.errorHandler.getError)
+        );
+    }
 }

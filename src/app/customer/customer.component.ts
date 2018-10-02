@@ -4,8 +4,8 @@ import { ViacepService, CustomerService } from '../_services';
 import { ViaCep, CepError, ICustomer } from '../_models';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UFs } from '../_models/Uf';
-import { ToastrService } from '../../../node_modules/ngx-toastr';
-import { map } from '../../../node_modules/rxjs/operators';
+import { ToastrService } from 'ngx-toastr';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-customer',

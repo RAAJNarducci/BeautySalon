@@ -1,4 +1,4 @@
-import { ICustomer } from 'src/app/_models';
+import { ICustomer } from '..';
 import { IJob } from '../job/job';
 
 export interface IAgendamentoResponse {

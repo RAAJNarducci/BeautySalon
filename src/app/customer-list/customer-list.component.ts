@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, PipeTransform } from '@angular/core';
 import { ICustomer } from '../_models';
 import { ToastrService } from 'ngx-toastr';
 import { CustomerService } from '../_services/customer.service';
 import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
@@ -16,6 +16,7 @@ export class CustomerListComponent implements OnInit {
 
   searchForm: FormGroup;
   customers: ICustomer[];
+  modalRef: NgbModalRef;
   submitted = false;
   id: 0;
   totalItens: 0;
@@ -65,12 +66,18 @@ export class CustomerListComponent implements OnInit {
   }
 
   delete() {
-    this.toastr.success('Hello world!', 'Toastr fun!');
+    this.customerService.delete(this.id).pipe(
+      map(() => {
+        this.modalRef.close();
+        this.search();
+        this.toastr.success('Cliente excluído', 'Sucesso!');
+      })
+    ).subscribe();
   }
 
   confirmDelete(content, id) {
     this.id = id;
-    this.modalService.open(content);
+    this.modalRef = this.modalService.open(content);
   }
 
   getPage(page) {

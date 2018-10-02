@@ -34,8 +34,8 @@
   <tbody>
     <tr class="text-center" *ngFor="let customer of customers | paginate: { id: 'server', itemsPerPage: 10, currentPage: pagination.pagina, totalItems: pagination.totalItems }">
       <td>{{customer.nome}}</td>
-      <td>{{customer.cpf}}</td>
-      <td>{{customer.telefone}}</td>
+      <td>{{customer.cpf | maskCpf}}</td>
+      <td>{{customer.telefone | maskPhone}}</td>
       <td>
         <button (click)="edit(customer.id)" class="btn btn-sm btn-outline-info">
           <span class="fa fa-edit">

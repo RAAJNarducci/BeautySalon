@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { map, catchError } from 'rxjs/operators';
-import { AlertService } from 'src/app/_services';
-import { ErrorHandler } from 'src/app/_helpers';
+import { ErrorHandler } from '../_helpers';
 
 @Injectable()
 export class AuthenticationService {
@@ -11,6 +10,7 @@ export class AuthenticationService {
         private errorHandler: ErrorHandler) { }
 
     login(email: string, password: string) {
+        let isLogado = false;
         const loginViewModel = {
             Email: email,
             Password: password
@@ -19,9 +19,12 @@ export class AuthenticationService {
         return this.http.post<any>('http://localhost:57911/api/login', loginViewModel)
             .pipe(
                 map(user => {
-                if (user && user.accessToken) {
-                    localStorage.setItem('currentUser', JSON.stringify(user));
-                }}),
+                    if (user && user.accessToken) {
+                        localStorage.setItem('currentUser', JSON.stringify(user));
+                        isLogado = true;
+                    }
+                    return isLogado;
+                }),
                 catchError(this.errorHandler.getError)
             );
     }
